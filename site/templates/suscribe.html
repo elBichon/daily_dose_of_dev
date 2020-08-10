@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+	{% block title %} 
+		suscribe Page 
+	{% endblock %}
+	{% block content %}
+		<h2>Thanks for joining the community</h2>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+					<h3>{{message}}</h3>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+	{% endblock %}
+
