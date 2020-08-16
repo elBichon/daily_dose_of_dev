@@ -4,46 +4,49 @@ from flask_mail import Mail, Message
 import re
 import pymongo
 from sqlalchemy import create_engine, MetaData, Table
-from flask import Flask, render_template, request, flash, session
-from flask_sqlalchemy import SQLAlchemy
-import re
-from flask_mail import Mail, Message
-import utils
-from flask import Flask, render_template, request, flash, session
-from flask_sqlalchemy import SQLAlchemy
-import re
-from flask_mail import Mail, Message
-import utils
-import pymongo
-from sqlalchemy import create_engine, MetaData, Table
-# Import smtplib for the actual sending function
 import smtplib
-# Import the email modules we'll need
 from email.message import EmailMessage
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlalchemy import update
+import credentials
+print(credentials.mongodb)
+app = Flask(__name__)
+app.secret_key = "hello"
+app.config["SQLALCHEMY_DATABASE_URI"] = credentials.url
+app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
+db = SQLAlchemy(app)
+class users(db.Model):
+	_id = db.Column("id",db.Integer, primary_key = True)
+	email = db.Column(db.String(100))
+	status = db.Column(db.Integer)
+	nb_day =  db.Column(db.Integer)
 
+	def __init__(self, email, status, nb_day):
+		self.email = email
+		self.status = status
+		self.nb_day = nb_day
 
 app = Flask(__name__)
 app.config.update(
 	DEBUG=True,
 	#EMAIL SETTINGS
-	MAIL_SERVER='',
+	MAIL_SERVER = credentials.mail_server,
 	MAIL_PORT=465,
 	MAIL_USE_SSL=True,
 	MAIL_USE_TLS = False,
-	MAIL_USERNAME = '',
-	MAIL_PASSWORD = ''
+	MAIL_USERNAME = credentials.email,
+	MAIL_PASSWORD = credentials.password
 	)
 mail = Mail(app)
 
+myclient = pymongo.MongoClient(credentials.mongourl)
+mydb = myclient[credentials.mongodb]
+mycol = mydb[credentials.collection]
 
 def check_email(user):
 	try:
 		if isinstance(user, str) == True and len(user) > 0 and bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", user)) == True:
-	#check if email actually exists
 			return True
 		else: 
 			return False
@@ -68,14 +71,14 @@ def check_nb_days(nb_day):
 	except:
 		return False
 
-def insert_user(found_user,users,user,status,nb_day,db):
+def insert_user(agree,found_user,users,user,status,nb_day,db):
 	try:		
 		if found_user:
 			session["email"] = found_user.email
 			flash("Your email is already in the database","info")
 			return False
 		else:
-			usr = users(user,status,nb_day)
+			usr = users(user,status,nb_day,agree)
 			db.session.add(usr)
 			db.session.commit()
 			flash("Your email has been added, you wil receive a confirmation email. You may have to check your spam folder","info")
@@ -100,26 +103,26 @@ def pick_query(found_user,status,db,users,user,sender_address):
 			msg_body = "update to free account"
 			msg_object = "free"
 			update_query(db,users,message,user,status)
-			send_email(user,sender_address,msg_body,msg_object)
+			flask_email(user,sender_address,msg_body,msg_object)
 		elif status == "2":
 			message = "Your account has been updated to a premium account, thank you, check your email for a confirmation from our side please"
 			msg_body = "update to premium account"
 			msg_object = "premium"
 			update_query(db,users,message,user,status)
-			send_email(user,sender_address,msg_body,msg_object)
+			flask_email(user,sender_address,msg_body,msg_object)
 		elif status == "3":
 			message = "Your account has been paused for now, thank you, check your email for a confirmation from our side please"
 			msg_body = "update to pause account"
 			msg_object = "pause"
 			update_query(db,users,message,user,status)
-			send_email(user,sender_address,msg_body,msg_object)
+			flask_email(user,sender_address,msg_body,msg_object)
 		elif status == "4":
 			msg_body = "update to delete account"
 			msg_object = "delete"
 			flash("Your account has been deleted, thank you, check your email for a confirmation from our side","info")
 			db.session.delete(found_user)
 			db.session.commit()
-			send_email(user,sender_address,msg_body,msg_object)
+			flask_email(user,sender_address,msg_body,msg_object)
 			return render_template("update_account.html")	
 	except:
 		return False
@@ -139,7 +142,7 @@ def update_account(db,users,user,status,sender_address):
 	except:
 		return False	
 
-def send_email(user,sender_address,msg_body,msg_object):
+def flask_email(user,sender_address,msg_body,msg_object):
 	try:
 		if check_email(user) == True and check_email(sender_address) == True:
 			msg = Message(msg_object, sender = sender_address, recipients = [user])
@@ -231,51 +234,77 @@ def get_mail_address(db_name,status,nb_day,list_status):
 	except:
 		return False
 
-def send_email(user,sender_address,msg_body,msg_object,password,mail_server):
+def get_status(db_name):
 	try:
-		msg = MIMEMultipart()
-		msg['From'] = sender_address
-		msg['Subject'] = msg_object
-		message = msg_body
-		for u in user:
-			msg['To'] = u
-			msg.attach(MIMEText(message))
-			mailserver = smtplib.SMTP(mail_server, 587)
-			mailserver.ehlo()
-			mailserver.starttls()
-			mailserver.ehlo()
-			mailserver.login(sender_address, password)
-			mailserver.sendmail(sender_address, u, msg.as_string())
-			mailserver.quit()
-	except:
-		pass
-
-def update_nb_days(db_name,user_list,nb_day):
-	try:
-		nb_day = str(int(nb_day) + 1)
-		for user in user_list:
+		if isinstance(db_name, str) == True and len(db_name) > 0:
 			engine = create_engine(db_name, convert_unicode=True)
 			metadata = MetaData(bind=engine)
-			query = "UPDATE users SET nb_day = "+str(nb_day)+" WHERE email = "+str(user)
-			print(query)
+			query = "SELECT DISTINCT status FROM users"
 			result = engine.execute(query)
-			return True
+			status_list = []
+			for _r in result:
+				status_list.append(str(_r[0]))
+			return status_list
+		else:
+			return False
 	except:
 		return False
 
-def newsletter_flow(nb_days,db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db):
+def send_email(mycol,query,user,sender_address,password,mail_server):
+	try:
+		if isinstance(sender_address, str) == True and len(sender_address) > 0 and isinstance(password, str) == True and len(password) > 0 and isinstance(mail_server, str) == True and len(mail_server) > 0:
+			msg = MIMEMultipart()
+			print('===============')
+			msg['From'] = sender_address
+			mydoc = mycol.find_one(query)
+			msg['Subject'] = str(mydoc['name'])
+			message = str(mydoc['address'])
+			for u in user:
+				print(u)
+				msg['To'] = u
+				msg.attach(MIMEText(message))	
+				mailserver = smtplib.SMTP(mail_server, 587)
+				mailserver.ehlo()
+				mailserver.starttls()
+				mailserver.ehlo()
+				mailserver.login(sender_address, password)
+				mailserver.sendmail(sender_address, u, msg.as_string())
+				mailserver.quit()
+		else:
+			return False
+	except:
+		return False
+
+def update_nb_days(db_name,user_list,nb_day):
+	try:
+		if isinstance(db_name, str) == True and len(db_name) > 0 and isinstance(user_list, list) == True and len(user_list) > 0 and isinstance(nb_day, str) == True and len(nb_day) > 0:
+			nb_day = str(int(nb_day) + 1)
+			for user in user_list:
+				query = users.query.filter_by(email=str(user)).update(dict(nb_day=nb_day))
+				db.session.commit()
+		return True
+	except:
+		return False
+
+def newsletter_flow(mycol,nb_days,db_name,status,list_status,password,mail_server,sender_address,db):
 	for nb_day in nb_days:
 		user_list = get_mail_address(db_name,status,nb_day,list_status)
-		send_email(user_list,sender_address,msg_body,msg_object,password,mail_server)
+		query = {"id":int(nb_day)}
+		send_email(mycol,query,user_list,sender_address,password,mail_server)
 		update_nb_days(db_name,user_list,nb_day)
 
-def send_newsletter(db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db):
-	if status == "0":
-		nb_days = get_nb_days(db_name, status)
-		newsletter_flow(nb_days,db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db)
-	elif status == "1":
-		nb_days = get_nb_days(db_name)
-		newsletter_flow(nb_days,db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db)
-	elif status == "2":
-		nb_days = get_nb_days(db_name)
-		newsletter_flow(nb_days,db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db)
+def send_newsletter(mycol,users,db_name,status,list_status,password,mail_server,sender_address,db):
+	status_list = get_status(db_name)
+	try:
+		for status in status_list:
+			if status == "0":
+				nb_days = get_nb_days(db_name, status)
+				newsletter_flow(mycol,nb_days,db_name,status,list_status,password,mail_server,sender_address,db)
+			elif status == "1":
+				nb_days = get_nb_days(db_name,status)
+				newsletter_flow(mycol,nb_days,db_name,status,list_status,password,mail_server,sender_address,db)
+			elif status == "2":
+				nb_days = get_nb_days(db_name,status)
+				newsletter_flow(mycol,nb_days,db_name,status,list_status,password,mail_server,sender_address,db)
+	except:
+		pass

@@ -1,25 +1,20 @@
+from flask_mail import Mail, Message
 from flask import Flask, render_template, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 import re
-from flask_mail import Mail, Message
 import utils
-from flask import Flask, render_template, request, flash, session
-from flask_sqlalchemy import SQLAlchemy
-import re
-from flask_mail import Mail, Message
-import utils
-import pymongo
 from sqlalchemy import create_engine, MetaData, Table
-import smtplib
 from email.message import EmailMessage
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import pymongo
+import credentials
 
 
 app = Flask(__name__)
 app.secret_key = "hello"
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///users.sqlite3'
+app.config["SQLALCHEMY_DATABASE_URI"] = credentials.url
 app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
 
 db = SQLAlchemy(app)
@@ -34,40 +29,36 @@ class users(db.Model):
 		self.status = status
 		self.nb_day = nb_day
 
-url = "mongodb://localhost:27017/"
-db_name = "mydatabase"
-collection_name = "customers5"
-data = [
-  { "name": "Amy", "address": "Apple st 652"},
-  { "name": "Hannah", "address": "Mountain 21"},
-  { "name": "Michael", "address": "Valley 345"},
-  { "name": "Sandy", "address": "Ocean blvd 2"},
-  { "name": "Betty", "address": "Green Grass 1"},
-  { "name": "Richard", "address": "Sky st 331"},
-  { "name": "Susan", "address": "One way 98"},
-  { "name": "Vicky", "address": "Yellow Garden 2"},
-  { "name": "Ben", "address": "Park Lane 38"},
-  { "name": "William", "address": "Central st 954"},
-  { "name": "Chuck", "address": "Main Road 989"},
-  { "name": "Viola", "address": "Sideway 1633"},
-  { "name": "test", "address": "toto 1633"},
-  { "name": "test", "address": "tata 1633"},
-  { "name": "test", "address": "titi 1633"},
-  { "name": "test", "address": "nono 1633"},
-  { "name": "test", "address": "zob 1633"}
-]
-myquery = {"address": "zob 1633"}
 status = "0"
 list_status = ["0","1","2"]
-sender_address = ''
+sender_address = credentials.email
+db_name = credentials.url
+password = credentials.password
+mail_server = credentials.mail_server
 
-db_name = ''
-password = ''
-mail_server = ''
+print(credentials.collection)
 
-if status == "0":
-	nb_days = utils.get_nb_days(db_name, status)
-	msg_body = 'toto'
-	msg_object = 'test'
-	nb_days = utils.get_nb_days(db_name, status)
-	utils.newsletter_flow(nb_days,db_name,status,list_status,msg_body,msg_object,password,mail_server,sender_address,db)
+myclient = pymongo.MongoClient(credentials.mongourl)
+mydb = myclient[credentials.mongodb]
+mycol = mydb[credentials.collection]
+
+mylist = [
+  { "id": 1,"name": "Amy", "address": "Apple st 652"},
+  { "id": 2,"name": "Hannah", "address": "Mountain 21"},
+  { "id": 3,"name": "Michael", "address": "Valley 345"},
+  { "id": 4,"name": "Sandy", "address": "Ocean blvd 2"},
+  { "id": 5,"name": "Betty", "address": "Green Grass 1"},
+  { "id": 6,"name": "Richard", "address": "Sky st 331"},
+  { "id": 7,"name": "Susan", "address": "One way 98"},
+  { "id": 8,"name": "Vicky", "address": "Yellow Garden 2"},
+  { "id": 9,"name": "Ben", "address": "Park Lane 38"},
+  { "id": 10,"name": "William", "address": "Central st 954"},
+  { "id": 11,"name": "Chuck", "address": "Main Road 989"},
+  { "id": 12,"name": "Viola", "address": "Sideway 1633"}
+]
+
+x = mycol.insert_many(mylist)
+
+#print(x.inserted_ids) 
+
+utils.send_newsletter(mycol,users,db_name,status,list_status,password,mail_server,sender_address,db)
