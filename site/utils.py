@@ -81,7 +81,7 @@ def insert_user(agree,found_user,users,user,status,nb_day,db):
 			usr = users(user,status,nb_day,agree)
 			db.session.add(usr)
 			db.session.commit()
-			flash("Your email has been added, you wil receive a confirmation email. You may have to check your spam folder","info")
+			flash("Your email has been added, you will receive a confirmation email. You may have to check your spam folder","info")
 			return True
 	except:
 		return False

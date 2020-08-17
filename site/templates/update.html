@@ -4,7 +4,7 @@
 	{% endblock %}
 	{% block content %}
 		<div class="w3-container" style="padding:128px 16px" id="team">
-			<h2 class="w3-center">Update your account</h2>
+			<h2 class="w3-center" id="ancre">Update your account</h2>
 				<form class="w3-center" action='/update_account' method="post">
 					<p>Email address:
 						<input type="email" name="email" placeholder="Enter Email" value="{{email if email}}"/>
@@ -15,7 +15,7 @@
 								<option value="3">Pause account</option>
 								<option value="4">Delete account</option>
 							</select></br>
-						<input class="w3-center" type="submit" value="submit"/>
+						<input class="w3-center button button1" type="submit" value="submit"/>
 					</p>
 				</form>
 			<div class="w3-row-padding w3-grayscale" style="margin-top:64px"></div>
