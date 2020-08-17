@@ -17,15 +17,12 @@
 
 
 ## Tech/Frameworks used:
-- [flask](https://keras.io/)
-- [javascript](https://keras.io/)
-- [css](https://keras.io/)
-- [sql](https://keras.io/)
-- [mongodb](https://keras.io/)
-- [python](https://keras.io/)
-- [pandas](https://keras.io/)
-- [beautifulsoup](https://keras.io/)
-- [selenium](https://keras.io/)
+- [flask](https://flask.palletsprojects.com/en/1.1.x/)
+- [mongodb](https://www.mongodb.com/)
+- [python](https://www.python.org/)
+- [pandas](https://pandas.pydata.org/)
+- [beautifulsoup](https://www.crummy.com/software/BeautifulSoup/)
+- [selenium](https://selenium-python.readthedocs.io/)
 
 
 ## Use Cases:
@@ -49,24 +46,24 @@
 ## References:
 * https://www.w3schools.com/python/python_mongodb_getstarted.asp
 * https://pythonprogramming.net/paypal-flask-tutorial/
-https://techwithtim.net/tutorials/flask/
-https://www.w3schools.com/w3css/w3css_templates.asp
-https://www.quennec.fr/trucs-astuces/langages/python/python-envoyer-un-mail-tout-simplement
-https://www.tutorialspoint.com/flask/flask_sqlalchemy.htm
-https://flask.palletsprojects.com/en/1.1.x/patterns/sqlalchemy/#manual-object-relational-mapping
-https://stackoverflow.com/questions/10021002/sqlalchemy-query-from-sql-with-multiple-where-conditions/10023053
-https://www.pythoncentral.io/sqlalchemy-orm-examples/
-https://flask-sqlalchemy.palletsprojects.com/en/2.x/queries/
-https://stackoverflow.com/questions/3332991/sqlalchemy-filter-multiple-columns
-https://launchschool.com/books/sql_first_edition/read/select_data
-https://julien.danjou.info/sending-emails-in-python-tutorial-code-examples/
-https://python.doctor/page-python-envoyer-mail-smtp
-https://stackabuse.com/how-to-send-emails-with-gmail-using-python/
-https://pymongo.readthedocs.io/en/stable/
-https://stackoverflow.com/questions/636548/select-in-sqlalchemy
-https://blog.ruanbekker.com/blog/2018/11/11/get-application-performance-metrics-on-python-flask-with-elastic-apm-on-kibana-and-elasticsearch/
-https://www.pythonsheets.com/notes/python-sqlalchemy.html
-https://openclassrooms.com/fr/courses/4462426-maitrisez-les-bases-de-donnees-nosql
-https://www.udacity.com/course/data-wrangling-with-mongodb--ud032
+* https://techwithtim.net/tutorials/flask/
+* https://www.w3schools.com/w3css/w3css_templates.asp
+* https://www.quennec.fr/trucs-astuces/langages/python/python-envoyer-un-mail-tout-simplement
+* https://www.tutorialspoint.com/flask/flask_sqlalchemy.htm
+* https://flask.palletsprojects.com/en/1.1.x/patterns/sqlalchemy/#manual-object-relational-mapping
+* https://stackoverflow.com/questions/10021002/sqlalchemy-query-from-sql-with-multiple-where-conditions/10023053
+* https://www.pythoncentral.io/sqlalchemy-orm-examples/
+* https://flask-sqlalchemy.palletsprojects.com/en/2.x/queries/
+* https://stackoverflow.com/questions/3332991/sqlalchemy-filter-multiple-columns
+* https://launchschool.com/books/sql_first_edition/read/select_data
+* https://julien.danjou.info/sending-emails-in-python-tutorial-code-examples/
+* https://python.doctor/page-python-envoyer-mail-smtp
+* https://stackabuse.com/how-to-send-emails-with-gmail-using-python/
+* https://pymongo.readthedocs.io/en/stable/
+* https://stackoverflow.com/questions/636548/select-in-sqlalchemy
+* https://blog.ruanbekker.com/blog/2018/11/11/get-application-performance-metrics-on-python-flask-with-elastic-apm-on-kibana-and-elasticsearch/
+* https://www.pythonsheets.com/notes/python-sqlalchemy.html
+* https://openclassrooms.com/fr/courses/4462426-maitrisez-les-bases-de-donnees-nosql
+* https://www.udacity.com/course/data-wrangling-with-mongodb--ud032
 
 
