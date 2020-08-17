@@ -47,8 +47,8 @@
 ## Conclusion
 
 ## References:
-https://www.w3schools.com/python/python_mongodb_getstarted.asp
-https://pythonprogramming.net/paypal-flask-tutorial/
+* https://www.w3schools.com/python/python_mongodb_getstarted.asp
+* https://pythonprogramming.net/paypal-flask-tutorial/
 https://techwithtim.net/tutorials/flask/
 https://www.w3schools.com/w3css/w3css_templates.asp
 https://www.quennec.fr/trucs-astuces/langages/python/python-envoyer-un-mail-tout-simplement
