@@ -1,5 +1,5 @@
 # Daily Dose of Dev
-
+![alt text](c2.jpg)
 [site of the project] (tbd)
 ###### Or how to create a newsletter sending technical interview questions and preparation tips in order to learn more about flask, nosql, web hosting and data structure.
 ## TLDR:
